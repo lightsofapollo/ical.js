@@ -3534,7 +3534,10 @@ ICAL.design = {
         ICAL.helpers.dumpn(e.stack);
         return null;
       }
+
+      return null;
     },
+
     fromIcalProperty: function fromIcalProperty(aProp) {
       var propval = aProp.getFirstValue();
       this.fromData(propval);
