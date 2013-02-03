@@ -11,8 +11,8 @@ perfCompareSuite('ICAL parse/stringify', function(perf, ICAL) {
     var data = ICAL.parse(icsData);
   });
 
-  perf.test('#stringify', function() {
-    ICAL.stringify(parsed);
-  });
+  //perf.test('#stringify', function() {
+    //ICAL.stringify(parsed);
+  //});
 
 });
