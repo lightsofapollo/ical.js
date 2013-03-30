@@ -239,40 +239,67 @@ suite('icaltime', function() {
 
   suite('#dayOfWeek', function() {
 
-    // format for dayOfWeek assertion
-    // is [dayNumber, dateObject]
-    var assertions = [
-      [Time.SUNDAY, new Date(2012, 0, 1)],
-      [Time.MONDAY, new Date(2012, 0, 2)],
-      [Time.TUESDAY, new Date(2012, 0, 3)],
-      [Time.WEDNESDAY, new Date(2012, 0, 4)],
-      [Time.THURSDAY, new Date(2012, 0, 5)],
-      [Time.FRIDAY, new Date(2012, 0, 6)],
-      [Time.SATURDAY, new Date(2012, 0, 7)]
-      //TODO: Add more I was lazy here this is
-      //      mostly to check that the function is
-      //      sane but if there is a bug somewhere
-      //      we can add tests above...
-    ];
+    suite('starts on sunday', function() {
+      // format for dayOfWeek assertion
+      // is [dayNumber, dateObject]
+      var assertions = [
+        [Time.SUNDAY, new Date(2012, 0, 1)],
+        [Time.MONDAY, new Date(2012, 0, 2)],
+        [Time.TUESDAY, new Date(2012, 0, 3)],
+        [Time.WEDNESDAY, new Date(2012, 0, 4)],
+        [Time.THURSDAY, new Date(2012, 0, 5)],
+        [Time.FRIDAY, new Date(2012, 0, 6)],
+        [Time.SATURDAY, new Date(2012, 0, 7)]
+        //TODO: Add more I was lazy here this is
+        //      mostly to check that the function is
+        //      sane but if there is a bug somewhere
+        //      we can add tests above...
+      ];
 
-    assertions.forEach(function(item) {
-      var dayOfWeek = item[0];
-      var date = item[1];
-      var human = date.getFullYear() + '-' + date.getMonth() + '-' + date.getDate();
-      var msg = human + ' should be #' + dayOfWeek + ' day';
+      assertions.forEach(function(item) {
+        var dayOfWeek = item[0];
+        var date = item[1];
+        var human = date.getFullYear() + '-' + date.getMonth() + '-' + date.getDate();
+        var msg = human + ' should be #' + dayOfWeek + ' day';
 
-      test(msg, function() {
-        var subject = new ICAL.Time.fromJSDate(
-          date
-        );
+        test(msg, function() {
+          var subject = new ICAL.Time.fromJSDate(
+            date
+          );
 
-        assert.equal(
-          subject.dayOfWeek(),
-          dayOfWeek
-        );
+          assert.equal(
+            subject.dayOfWeek(),
+            dayOfWeek
+          );
+        });
       });
     });
 
+    suite('start on monday', function() {
+      var assertions = [
+        { date: 1, day: 7 },
+        { date: 2, day: 1 },
+        { date: 3, day: 2 },
+        { date: 4, day: 3 },
+        { date: 5, day: 4 },
+        { date: 6, day: 5 },
+        { date: 7, day: 6 },
+        { date: 8, day: 7 },
+        { date: 9, day: 1 }
+      ];
+
+      assertions.forEach(function(expectation) {
+        test('Jan ' + expectation.date + ' 2012', function() {
+          var time = new ICAL.Time({
+            year: 2012,
+            month: 1,
+            day: expectation.date
+          });
+
+          assert.equal(time.dayOfWeek(Time.MONDAY), expectation.day);
+        });
+      });
+    });
   });
 
   suite('#dayOfYear', function() {
