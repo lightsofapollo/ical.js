@@ -37,8 +37,9 @@
       'timezone',
       'timezone_service',
       'time',
+      'recur_iterator',
       'recur',
-      'recur_iterator'
+      'recurring/window'
     ];
 
     files.forEach(function(file) {
