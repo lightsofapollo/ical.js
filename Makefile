@@ -56,6 +56,13 @@ test-agent-config:
 .PHONY: test
 test: test-browser test-node
 
+.PHONY: test-node-only
+test-node-only:
+	./node_modules/mocha/bin/mocha --ui tdd \
+		test/helper.js \
+		test/*_test.js \
+		test/acceptance/*_test.js
+
 .PHONY: test-node
 test-node:
 	./node_modules/mocha/bin/mocha --ui tdd \
