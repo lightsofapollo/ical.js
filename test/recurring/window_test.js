@@ -52,7 +52,7 @@ suite('ICAL.Recurring.Window', function() {
     });
   });
 
-  function verifyIncrement(time, options, expected) {
+  function verifyIncrement(options, time, expected) {
     var desc = '#increment ';
 
     desc += 'frequency=' + options.frequency;
@@ -87,9 +87,29 @@ suite('ICAL.Recurring.Window', function() {
     });
   }
 
+  function verifyMoveToNearestDate(options, target, time, result) {
+    var targetDesc = JSON.stringify(target);
+    var timeDesc = JSON.stringify(time);
+
+    var desc = '#nearestDate target=' + targetDesc + ' time=' + timeDesc;
+
+    test(desc, function() {
+      var subject = new ICAL.Recurring.Window(options);
+      var targetObj = new ICAL.Time(target);
+      var timeObj = new ICAL.Time(time);
+
+      subject.moveToNearestDate(targetObj, timeObj);
+
+      assert.deepEqual(
+        timeObj.toJSDate(),
+        new ICAL.Time(result).toJSDate()
+      );
+    });
+  }
+
   verifyIncrement(
-    { year: 2012, month: 3, day: 17 },
     { frequency: 'yearly' },
+    { year: 2012, month: 3, day: 17 },
     [
       { year: 2013, month: 1, day: 1 },
       { year: 2014, month: 1, day: 1 },
@@ -100,8 +120,8 @@ suite('ICAL.Recurring.Window', function() {
   );
 
   verifyIncrement(
-    { year: 2010 },
     { frequency: 'yearly', interval: 5 },
+    { year: 2010 },
     [
       { year: 2015 },
       { year: 2020 },
@@ -110,8 +130,8 @@ suite('ICAL.Recurring.Window', function() {
   );
 
   verifyIncrement(
-    { year: 2012, month: 10, day: 5 },
     { frequency: 'monthly' },
+    { year: 2012, month: 10, day: 5 },
     [
       { year: 2012, month: 11, day: 1 },
       { year: 2012, month: 12, day: 1 },
@@ -121,8 +141,8 @@ suite('ICAL.Recurring.Window', function() {
   );
 
   verifyIncrement(
-    { year: 2012, month: 5 },
     { frequency: 'monthly', interval: 5 },
+    { year: 2012, month: 5 },
     [
       { year: 2012, month: 10 },
       { year: 2013, month: 3 },
@@ -132,8 +152,8 @@ suite('ICAL.Recurring.Window', function() {
   );
 
   verifyIncrement(
-    { year: 2012, month: 1, day: 5 },
     { frequency: 'weekly' },
+    { year: 2012, month: 1, day: 5 },
     // monday is default start of week per rfc5545
     [
       { year: 2012, month: 1, day: 9 },
@@ -145,8 +165,8 @@ suite('ICAL.Recurring.Window', function() {
   );
 
   verifyIncrement(
-    { year: 2012, month: 1, day: 5 },
     { frequency: 'weekly', interval: 5 },
+    { year: 2012, month: 1, day: 5 },
     // monday is default start of week per rfc5545
     [
       { year: 2012, month: 2, day: 6 },
@@ -155,8 +175,8 @@ suite('ICAL.Recurring.Window', function() {
   );
 
   verifyIncrement(
-    { year: 2012, month: 1, day: 30 },
     { frequency: 'daily' },
+    { year: 2012, month: 1, day: 30 },
     [
       { year: 2012, month: 1, day: 31 },
       { year: 2012, month: 2, day: 1 },
@@ -168,12 +188,61 @@ suite('ICAL.Recurring.Window', function() {
   );
 
   verifyIncrement(
-    { year: 2012, month: 1, day: 25 },
     { frequency: 'daily', interval: 6 },
+    { year: 2012, month: 1, day: 25 },
     [
       { year: 2012, month: 1, day: 31 },
       { year: 2012, month: 2, day: 6 }
     ]
   );
+
+  // simplest case linear jump no intervals
+  verifyMoveToNearestDate(
+    { frequency: 'yearly' },
+    { year: 2020 }, // target
+    { year: 2010 }, // current
+    { year: 2020 }  // expected
+  );
+
+  // cannot jump directly to year without breaking interval rule
+  verifyMoveToNearestDate(
+    { frequency: 'yearly', interval: 5 },
+    { year: 2020 },
+    { year: 2012 },
+    { year: 2017 }
+  );
+
+  // interval rule allows jump
+  verifyMoveToNearestDate(
+    { frequency: 'yearly', interval: 12 },
+    { year: 2024 },
+    { year: 2012 },
+    { year: 2024 }
+  );
+
+  // verify jumps in same year
+  verifyMoveToNearestDate(
+    { frequency: 'monthly' },
+    { year: 2013, month: 7 },
+    { year: 2012, month: 1 },
+    { year: 2013, month: 7 }
+  );
+
+  // verify jumps to different years
+  verifyMoveToNearestDate(
+    { frequency: 'monthly' },
+    { year: 2013, month: 11 },
+    { year: 2012, month: 1 },
+    { year: 2013, month: 11 }
+  );
+
+  // verify multi-year jump with interval
+  verifyMoveToNearestDate(
+    { frequency: 'monthly', interval: 7 },
+    { year: 2020, month: 11 },
+    { year: 1997, month: 2 },
+    { year: 2020, month: 6 } // manually verified with math
+  );
+
 
 });
