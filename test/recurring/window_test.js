@@ -244,5 +244,37 @@ suite('ICAL.Recurring.Window', function() {
     { year: 2020, month: 6 } // manually verified with math
   );
 
+  // linear jump from partially completed week
+  verifyMoveToNearestDate(
+    { frequency: 'weekly' },
+    { year: 2012, month: 1, day: 31 },
+    { year: 2012, month: 1, day: 4 },
+    // remember default week start is monday
+    { year: 2012, month: 1, day: 30 }
+  );
+
+  // one day from now (don't move)
+  verifyMoveToNearestDate(
+    { frequency: 'weekly' },
+    { year: 2012, month: 1, day: 5 },
+    { year: 2012, month: 1, day: 4 },
+    { year: 2012, month: 1, day: 4 }
+  );
+
+  // week with interval
+  verifyMoveToNearestDate(
+    { frequency: 'weekly', interval: 3 },
+    { year: 2012, month: 1, day: 30 },
+    { year: 2012, month: 1, day: 4 },
+    { year: 2012, month: 1, day: 23 }
+  );
+
+  // large interval where its easy to skip over target date.
+  verifyMoveToNearestDate(
+    { frequency: 'weekly', interval: 15 },
+    { year: 2013, month: 1, day: 1 },
+    { year: 2012, month: 7, day: 18 },
+    { year: 2012, month: 10, day: 29 }
+  );
 
 });
